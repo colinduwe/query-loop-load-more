@@ -284,9 +284,14 @@ class Plugin {
 		// more posts available
 		if ( $page < $max_pages ) {
 
+			// Key so the Interactivity API replaces the button on navigate (e.g. new search).
+			$path  = wp_parse_url( add_query_arg( array() ), PHP_URL_PATH );
+			$query = wp_parse_url( add_query_arg( array() ), PHP_URL_QUERY );
+			$button_key = ( $path ?: '/' ) . ( $query ? '?' . $query : '' );
+
 			// Build list of load more links.
 			$block_content = sprintf(
-				'<a class="%1$s" href="?%2$s=%3$d" data-query-next-page="%3$d" data-query-key="%5$d" data-query-max-page="%6$d" data-query-url="%2$s" data-update-url="%7$s"><span class="qllm-loading">%4$s%9$s</span><span class="qllm-load-more%10$s">%8$s</span></a>',
+				'<a class="%1$s" href="?%2$s=%3$d" data-query-next-page="%3$d" data-query-key="%5$d" data-query-max-page="%6$d" data-query-url="%2$s" data-update-url="%7$s" data-wp-key="%11$s"><span class="qllm-loading">%4$s%9$s</span><span class="qllm-load-more%10$s">%8$s</span></a>',
 				$button_classes,
 				$page_parameter,
 				$page + 1,
@@ -296,7 +301,8 @@ class Plugin {
 				$is_update_url,
 				$is_infinite ? esc_html( $attributes['loadMoreText'] ) : esc_html( $attributes['loadMoreText'] ) . $pagination_arrow,
 				$infinite_scroll_markup,
-				$is_infinite ? ' screen-reader-text' : '' // Note space at the beginning of the class name
+				$is_infinite ? ' screen-reader-text' : '', // Note space at the beginning of the class name
+				esc_attr( $button_key )
 			);
 		} else {
 			// All posts loaded.

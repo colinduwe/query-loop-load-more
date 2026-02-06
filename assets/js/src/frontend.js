@@ -89,12 +89,20 @@ const fetchPosts = ( target ) => {
 				`.wp-block-query[data-qllm-query-region="${ containerRegion }"] .wp-block-post-template`
 			);
 
-			// append the posts
+			// Append the posts and mark them so router can strip before navigate.
 			const targetTpl = container.querySelector(
 				'.wp-block-post-template'
 			);
 			if ( targetTpl && posts ) {
-				targetTpl.insertAdjacentHTML( 'beforeend', posts.innerHTML );
+				const frag = document.createElement( 'div' );
+				frag.innerHTML = posts.innerHTML;
+				while ( frag.firstChild ) {
+					const node = frag.firstChild;
+					if ( node.nodeType === Node.ELEMENT_NODE ) {
+						node.setAttribute( 'data-qllm-appended', '' );
+					}
+					targetTpl.appendChild( node );
+				}
 			}
 
 			const buttonElement = button.closest( '.wp-block-button' );
